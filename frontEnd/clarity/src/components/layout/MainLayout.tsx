@@ -15,6 +15,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between h-16 items-center">
               <div className="flex items-center">
+                {/* <img src="/clarity-logo.png" alt="Clarity Logo" className="h-8 w-auto mr-3" /> */}
                 <h1 className="text-xl font-semibold text-[#333333] font-sans tracking-tight">CSCI270</h1>
               </div>
               
