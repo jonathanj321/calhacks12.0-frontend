@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 type PDFViewerProps = {
   url: string;
@@ -6,37 +6,11 @@ type PDFViewerProps = {
 };
 
 export default function PDFViewer({ url, onClose }: PDFViewerProps) {
-  const [content, setContent] = useState<string>('Loading...');
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function fetchPDF() {
-      try {
-        setIsLoading(true);
-        const response = await fetch(url);
-        
-        if (!response.ok) {
-          throw new Error(`Failed to load file: ${response.status} ${response.statusText}`);
-        }
-        
-        const text = await response.text();
-        setContent(text);
-        setIsLoading(false);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An unknown error occurred');
-        setIsLoading(false);
-      }
-    }
-
-    fetchPDF();
-  }, [url]);
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
         <div className="flex justify-between items-center p-4 border-b border-gray-200">
-          <h3 className="text-lg font-medium">PDF Viewer (Demo)</h3>
+          <h3 className="text-lg font-medium">PDF Viewer</h3>
           <button 
             onClick={onClose}
             className="text-gray-400 hover:text-gray-500 focus:outline-none"
@@ -49,29 +23,19 @@ export default function PDFViewer({ url, onClose }: PDFViewerProps) {
         </div>
         
         <div className="p-6 overflow-auto flex-grow">
-          {isLoading ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-            </div>
-          ) : error ? (
-            <div className="text-red-500">
-              <p className="font-bold">Error:</p>
-              <p>{error}</p>
-              <p className="mt-4 text-sm text-gray-600">
-                Note: In a production environment, you would have actual PDF files here instead of text files.
+          <div className="w-full h-[70vh]">
+            <object 
+              data={url} 
+              type="application/pdf" 
+              width="100%" 
+              height="100%"
+              className="border rounded"
+            >
+              <p>Your browser does not support embedded PDFs. 
+                <a href={url} target="_blank" rel="noopener noreferrer">Click here to download the PDF</a>
               </p>
-            </div>
-          ) : (
-            <div className="prose max-w-none">
-              <div className="bg-gray-100 p-4 rounded mb-4">
-                <p className="text-sm text-gray-600 italic">
-                  Note: This is a text file simulating a PDF for demonstration purposes.
-                  In a real application, this would display an actual PDF document.
-                </p>
-              </div>
-              <pre className="whitespace-pre-wrap">{content}</pre>
-            </div>
-          )}
+            </object>
+          </div>
         </div>
         
         <div className="px-4 py-3 bg-gray-50 text-right rounded-b-lg">

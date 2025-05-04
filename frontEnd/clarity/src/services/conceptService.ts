@@ -44,15 +44,14 @@ const conceptsData: Record<string, ConceptData> = {
       'Matrix chain multiplication'
     ],
     materials: [
-      { id: '1', name: 'Introduction to Dynamic Programming', type: 'slides', url: '/pdfs/dynamic-programming/dp_slides.pdf.txt' },
-      { id: '2', name: 'Dynamic Programming Example Problems', type: 'notes', url: '/pdfs/dynamic-programming/dp_notes.pdf.txt' },
-      { id: '3', name: 'DP Practice Problems Set 1', type: 'questions', url: '/pdfs/dynamic-programming/dp_questions.pdf.txt' },
+      { id: '1', name: 'Introduction to Dynamic Programming', type: 'slides', url: '/pdfs/dynamic-programming/dp_slides.pdf' },
+      { id: '2', name: 'Dynamic Programming Example Problems', type: 'notes', url: '/pdfs/dynamic-programming/dp_notes.pdf' },
+      { id: '3', name: 'DP Practice Problems Set 1', type: 'questions', url: '/pdfs/dynamic-programming/dp_questions.pdf' },
     ],
     questions: [
-      { id: '1', title: 'Fibonacci Sequence', difficulty: 'easy', url: '#' },
-      { id: '2', title: 'Longest Common Subsequence', difficulty: 'medium', url: '#' },
-      { id: '3', title: 'Coin Change Problem', difficulty: 'medium', url: '#' },
-      { id: '4', title: 'Knapsack Problem', difficulty: 'hard', url: '#' },
+      { id: '1', title: 'Binary Search Tree Problem', difficulty: 'medium', url: '/pdfs/dynamic-programming/binary_search_tree.pdf' },
+      { id: '2', title: 'Powder Mixing Problem', difficulty: 'hard', url: '/pdfs/dynamic-programming/powder_problem.pdf' },
+      { id: '3', title: 'Gas Station Problem', difficulty: 'easy', url: '/pdfs/dynamic-programming/gas_station_problem.pdf' },
     ],
   },
   'divide-and-conquer': {
@@ -71,14 +70,14 @@ const conceptsData: Record<string, ConceptData> = {
       'Strassen\'s matrix multiplication'
     ],
     materials: [
-      { id: '1', name: 'Divide & Conquer Principles', type: 'slides', url: '/pdfs/dynamic-programming/dp_slides.pdf.txt' },
-      { id: '2', name: 'Sorting Algorithms Implementation', type: 'notes', url: '/pdfs/dynamic-programming/dp_notes.pdf.txt' },
-      { id: '3', name: 'Divide & Conquer Problem Set', type: 'questions', url: '/pdfs/dynamic-programming/dp_questions.pdf.txt' },
+      { id: '1', name: 'Divide & Conquer Principles', type: 'slides', url: '/pdfs/dynamic-programming/dp_slides.pdf' },
+      { id: '2', name: 'Sorting Algorithms Implementation', type: 'notes', url: '/pdfs/dynamic-programming/dp_notes.pdf' },
+      { id: '3', name: 'Divide & Conquer Problem Set', type: 'questions', url: '/pdfs/dynamic-programming/dp_questions.pdf' },
     ],
     questions: [
-      { id: '1', title: 'Merge Sort Implementation', difficulty: 'easy', url: '#' },
-      { id: '2', title: 'Quick Sort Implementation', difficulty: 'medium', url: '#' },
-      { id: '3', title: 'Closest Pair of Points', difficulty: 'hard', url: '#' },
+      { id: '1', title: 'Binary Search Tree Problem', difficulty: 'medium', url: '/pdfs/dynamic-programming/binary_search_tree.pdf' },
+      { id: '2', title: 'Powder Mixing Problem', difficulty: 'hard', url: '/pdfs/dynamic-programming/powder_problem.pdf' },
+      { id: '3', title: 'Gas Station Problem', difficulty: 'easy', url: '/pdfs/dynamic-programming/gas_station_problem.pdf' },
     ],
   },
   'greedy': {
@@ -98,14 +97,14 @@ const conceptsData: Record<string, ConceptData> = {
       'Fractional knapsack problem'
     ],
     materials: [
-      { id: '1', name: 'Greedy Algorithm Fundamentals', type: 'slides', url: '/pdfs/dynamic-programming/dp_slides.pdf.txt' },
-      { id: '2', name: 'Greedy vs Dynamic Programming', type: 'notes', url: '/pdfs/dynamic-programming/dp_notes.pdf.txt' },
-      { id: '3', name: 'Greedy Algorithms Practice', type: 'questions', url: '/pdfs/dynamic-programming/dp_questions.pdf.txt' },
+      { id: '1', name: 'Greedy Algorithm Fundamentals', type: 'slides', url: '/pdfs/dynamic-programming/dp_slides.pdf' },
+      { id: '2', name: 'Greedy vs Dynamic Programming', type: 'notes', url: '/pdfs/dynamic-programming/dp_notes.pdf' },
+      { id: '3', name: 'Greedy Algorithms Practice', type: 'questions', url: '/pdfs/dynamic-programming/dp_questions.pdf' },
     ],
     questions: [
-      { id: '1', title: 'Activity Selection Problem', difficulty: 'easy', url: '#' },
-      { id: '2', title: 'Huffman Coding', difficulty: 'medium', url: '#' },
-      { id: '3', title: 'Minimum Spanning Tree', difficulty: 'hard', url: '#' },
+      { id: '1', title: 'Binary Search Tree Problem', difficulty: 'medium', url: '/pdfs/dynamic-programming/binary_search_tree.pdf' },
+      { id: '2', title: 'Powder Mixing Problem', difficulty: 'hard', url: '/pdfs/dynamic-programming/powder_problem.pdf' },
+      { id: '3', title: 'Gas Station Problem', difficulty: 'easy', url: '/pdfs/dynamic-programming/gas_station_problem.pdf' },
     ],
   },
   'network-flow': {
@@ -125,9 +124,9 @@ const conceptsData: Record<string, ConceptData> = {
       'Network reliability'
     ],
     materials: [
-      { id: '1', name: 'Introduction to Dynamic Programming', type: 'slides', url: '/pdfs/dynamic-programming/dp_slides.pdf.txt' },
-      { id: '2', name: 'Dynamic Programming Example Problems', type: 'notes', url: '/pdfs/dynamic-programming/dp_notes.pdf.txt' },
-      { id: '3', name: 'DP Practice Problems Set 1', type: 'questions', url: '/pdfs/dynamic-programming/dp_questions.pdf.txt' },
+      { id: '1', name: 'Introduction to Dynamic Programming', type: 'slides', url: '/pdfs/dynamic-programming/dp_slides.pdf' },
+      { id: '2', name: 'Dynamic Programming Example Problems', type: 'notes', url: '/pdfs/dynamic-programming/dp_notes.pdf' },
+      { id: '3', name: 'DP Practice Problems Set 1', type: 'questions', url: '/pdfs/dynamic-programming/dp_questions.pdf' },
     ],
     questions: [
       { id: '1', title: 'Fibonacci Sequence', difficulty: 'easy', url: '#' },

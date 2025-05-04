@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Question, QuestionDifficulty } from '@/services/conceptService';
 import QuestionViewer from './QuestionViewer';
+import PDFViewer from '../concept/PDFViewer';
 
 type ConceptQuestionsProps = {
   conceptName: string;
@@ -15,6 +16,7 @@ export default function ConceptQuestions({
 }: ConceptQuestionsProps) {
   const [filter, setFilter] = useState<'all' | QuestionDifficulty>('all');
   const [viewingQuestion, setViewingQuestion] = useState<Question | null>(null);
+  const [viewingPdf, setViewingPdf] = useState<Question | null>(null);
   const [viewedQuestions, setViewedQuestions] = useState<Record<string, boolean>>({});
   
   const filteredQuestions = filter === 'all' 
@@ -24,6 +26,16 @@ export default function ConceptQuestions({
   // Handle viewing a question
   const handleViewQuestion = (question: Question) => {
     setViewingQuestion(question);
+    // Mark question as viewed
+    setViewedQuestions(prev => ({
+      ...prev,
+      [question.id]: true
+    }));
+  };
+
+  // Handle viewing the PDF directly
+  const handleViewPdf = (question: Question) => {
+    setViewingPdf(question);
     // Mark question as viewed
     setViewedQuestions(prev => ({
       ...prev,
@@ -41,6 +53,7 @@ export default function ConceptQuestions({
     onSelectQuestion(question);
     // Close the viewer if it's open
     setViewingQuestion(null);
+    setViewingPdf(null);
   };
 
   return (
@@ -142,7 +155,7 @@ export default function ConceptQuestions({
                     
                     <div className="flex space-x-2 ml-4">
                       <button
-                        onClick={() => handleViewQuestion(question)}
+                        onClick={() => handleViewPdf(question)}
                         className={`px-3 py-1 text-xs border rounded-md flex items-center ${
                           isQuestionViewed(question.id) 
                             ? 'border-[#DE7356]/30 text-[#DE7356] bg-[#DE7356]/5 hover:bg-[#DE7356]/10' 
@@ -173,12 +186,20 @@ export default function ConceptQuestions({
         )}
       </div>
 
-      {/* Question Viewer Modal */}
+      {/* Question Info Viewer Modal */}
       {viewingQuestion && (
         <QuestionViewer 
           question={viewingQuestion}
           onClose={() => setViewingQuestion(null)}
           onAsk={handleAskQuestion}
+        />
+      )}
+
+      {/* PDF Viewer Modal */}
+      {viewingPdf && (
+        <PDFViewer 
+          url={viewingPdf.url} 
+          onClose={() => setViewingPdf(null)} 
         />
       )}
     </div>
