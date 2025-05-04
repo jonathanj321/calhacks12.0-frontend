@@ -1,3 +1,6 @@
+console.log('🛠️  index.js loaded, setting up routes…');
+
+
 require('dotenv').config();
 const express = require('express');
 const cors    = require('cors');
@@ -58,49 +61,47 @@ app.post('/upload', upload.single('file'), (req, res) => {
 
 // ─── 4) List metadata ─────────────────────────────────────────────────────────
 // ─── Download & stream a file by filename ────────────────────────────────────
-app.get('/file/:filename', (req, res) => {
+// ─── 5) Download & stream a file by filename (simplified) ────────────────
+app.get('/file/:filename', async (req, res) => {
     const filename = req.params.filename;
-    console.log('📥 Received download request for', filename);
+    console.log('📥 Download requested for', filename);
   
-    // 1) Lookup the file metadata
-    gfs.files.findOne({ filename }, (err, file) => {
-      if (err) {
-        console.error('🔴 findOne error:', err);
-        return res.status(500).send('Server error');
-      }
-      if (!file) {
+    try {
+      // 1) Find the file document via the bucket
+      const files = await gfsBucket.find({ filename }).toArray();
+      if (!files || files.length === 0) {
         console.warn('⚠️  File not found in DB:', filename);
         return res.status(404).send('Not found');
       }
-  
+      const file = files[0];
       console.log('✔️  Found file in DB:', file.filename, 'size=', file.length);
   
-      // 2) Send headers so the client knows how many bytes to expect
-      res.writeHead(200, {
-        'Content-Type':        file.contentType,
-        'Content-Length':      file.length,
-        'Content-Disposition': `inline; filename="${file.filename}"`
-      });
+      // 2) Set the headers up front
+      res.setHeader('Content-Type',        file.contentType);
+      res.setHeader('Content-Length',      file.length);
+      res.setHeader(
+        'Content-Disposition',
+        `inline; filename="${file.filename}"`
+      );
   
-      // 3) Stream the chunks and explicitly end the response
+      // 3) Open the download stream and pipe it directly to res
       const downloadStream = gfsBucket.openDownloadStream(file._id);
       downloadStream
-        .on('data',   chunk => {
-          console.log(`→ Sending chunk of ${chunk.length} bytes`);
-          res.write(chunk);
-        })
-        .on('error',  err   => {
+        .on('error', err => {
           console.error('🔴 GridFS download error:', err);
-          // If headers haven’t been sent, send a 500; otherwise just end
+          // If headers already sent, just close; otherwise send 500
           if (!res.headersSent) res.sendStatus(500);
           else res.end();
         })
-        .on('end',    ()    => {
-          console.log('✅ All chunks sent; ending response');
-          res.end();
-        });
-    });
+        .pipe(res);  // pipe will end res for you once the stream ends
+  
+    } catch (err) {
+      console.error('❌ Error in download handler:', err);
+      if (!res.headersSent) res.sendStatus(500);
+      else res.end();
+    }
   });
+  
   
   
 
