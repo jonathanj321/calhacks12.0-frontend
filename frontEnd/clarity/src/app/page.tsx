@@ -87,7 +87,7 @@ export default function Home() {
         {/* Welcome Section */}
         <div className="bg-white shadow-sm rounded-lg p-6">
           <div className="flex items-center space-x-4">
-            <div className="h-12 w-12 rounded-full bg-blue-600 flex items-center justify-center text-white">
+            <div className="h-12 w-12 rounded-full bg-[#DE7356] flex items-center justify-center text-white">
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
               </svg>
@@ -129,7 +129,7 @@ export default function Home() {
               </h2>
               <button 
                 onClick={() => setShowAllProblems(!showAllProblems)}
-                className="text-sm font-medium text-blue-600 hover:text-blue-500"
+                className="text-sm font-medium text-[#DE7356] hover:text-[#B05A44]"
               >
                 {showAllProblems ? 'Show Recommended' : 'View All'}
               </button>
@@ -142,8 +142,8 @@ export default function Home() {
                   {displayedProblems.length === 0 ? (
                     <div className="text-center py-4 text-gray-500">No problems available</div>
                   ) : (
-                    displayedProblems.map((problem) => (
-                      <li key={problem.id} className="py-4">
+                    displayedProblems.map((problem, index) => (
+                      <li key={`${problem.id}-${problem.concept}-${index}`} className="py-4">
                         <Link href={problem.url} className="block hover:bg-gray-50">
                           <div className="flex items-center space-x-4">
                             <div className="flex-1 min-w-0">
@@ -177,7 +177,7 @@ export default function Home() {
               <h2 className="text-lg font-medium text-gray-900">Your Progress</h2>
               <button 
                 onClick={() => setShowAllProgress(!showAllProgress)}
-                className="text-sm font-medium text-blue-600 hover:text-blue-500"
+                className="text-sm font-medium text-[#DE7356] hover:text-[#B05A44]"
               >
                 {showAllProgress ? 'Show Less' : 'View All'}
               </button>
@@ -199,14 +199,14 @@ export default function Home() {
                         : 0;
                         
                       return (
-                        <div key={concept.name}>
+                        <div key={`progress-${concept.name}-${concept.questions.length}`}>
                           <div className="flex items-center justify-between">
                             <p className="text-sm font-medium text-gray-700">{concept.name}</p>
                             <p className="text-sm font-medium text-gray-700">{viewedCount}/{totalQuestions} viewed</p>
                           </div>
                           <div className="mt-2 w-full bg-gray-200 rounded-full h-2.5">
                             <div 
-                              className="bg-blue-600 h-2.5 rounded-full" 
+                              className="bg-[#DE7356] h-2.5 rounded-full" 
                               style={{ width: `${percentageViewed}%` }}
                             ></div>
                           </div>

@@ -7,19 +7,21 @@ type MainLayoutProps = {
 
 export default function MainLayout({ children }: MainLayoutProps) {
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-[#FAFAFA]">
       <Sidebar />
       
       <div className="flex-1 ml-64">
-        <header className="bg-white shadow-sm sticky top-0 z-10">
+        <header className="bg-[#F0F0F0] border-b border-[#E0E0E0] z-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between h-16 items-center">
-              <h1 className="text-xl font-semibold text-gray-900">CSCI270</h1>
+              <div className="flex items-center">
+                <h1 className="text-xl font-semibold text-[#333333] font-sans tracking-tight">CSCI270</h1>
+              </div>
               
               <div className="flex items-center">
                 <button
                   type="button"
-                  className="p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  className="p-1 rounded-full text-[#666666] hover:text-[#333333] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#DE7356]"
                 >
                   <span className="sr-only">View notifications</span>
                   <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -31,10 +33,10 @@ export default function MainLayout({ children }: MainLayoutProps) {
                   <div>
                     <button
                       type="button"
-                      className="max-w-xs flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                      className="max-w-xs flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#DE7356]"
                     >
                       <span className="sr-only">Open user menu</span>
-                      <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white">
+                      <div className="h-8 w-8 rounded-full bg-[#DE7356] flex items-center justify-center text-white">
                         U
                       </div>
                     </button>

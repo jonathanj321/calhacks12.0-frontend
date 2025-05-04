@@ -28,7 +28,7 @@ export default function ConceptMaterial({
 
   return (
     <div className="bg-white rounded-xl shadow-md overflow-hidden h-full flex flex-col">
-      <div className="p-4 bg-blue-600 text-white">
+      <div className="p-4 bg-[#DE7356] text-white">
         <h2 className="text-xl font-semibold">{conceptName}</h2>
       </div>
       

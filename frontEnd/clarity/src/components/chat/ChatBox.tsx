@@ -126,10 +126,10 @@ export default function ChatBox({ conceptContext, questionContext }: ChatBoxProp
 
   return (
     <div className="h-96 border border-gray-300 rounded-xl flex flex-col bg-gray-50">
-      <div className="p-4 bg-blue-600 text-white rounded-t-xl">
+      <div className="p-4 bg-[#DE7356] text-white rounded-t-xl">
         <h3 className="font-medium">Clarity Assistant</h3>
         {conceptContext && (
-          <p className="text-sm text-blue-100">Context: {conceptContext}</p>
+          <p className="text-sm text-white opacity-90">Context: {conceptContext}</p>
         )}
       </div>
 
@@ -139,7 +139,7 @@ export default function ChatBox({ conceptContext, questionContext }: ChatBoxProp
             key={message.id} 
             className={`max-w-3/4 p-3 rounded-lg ${
               message.sender === 'user' 
-                ? 'bg-blue-500 text-white ml-auto' 
+                ? 'bg-[#DE7356] text-white ml-auto' 
                 : 'bg-gray-200 text-gray-800'
             }`}
           >
@@ -160,7 +160,7 @@ export default function ChatBox({ conceptContext, questionContext }: ChatBoxProp
       <form onSubmit={handleSendMessage} className="p-4 border-t border-gray-300 flex">
         <input
           type="text"
-          className="flex-1 border border-gray-300 rounded-l-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 border border-gray-300 rounded-l-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#DE7356]"
           placeholder={questionContext 
             ? `Ask about ${questionContext}...` 
             : `Ask about ${conceptContext || 'algorithms'}...`
@@ -171,7 +171,7 @@ export default function ChatBox({ conceptContext, questionContext }: ChatBoxProp
         />
         <button
           type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded-r-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="bg-[#DE7356] text-white px-4 py-2 rounded-r-lg hover:bg-[#C26B56] focus:outline-none focus:ring-2 focus:ring-[#DE7356]"
           disabled={isLoading || !inputValue.trim()}
         >
           Send

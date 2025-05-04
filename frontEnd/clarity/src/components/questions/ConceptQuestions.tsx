@@ -45,9 +45,9 @@ export default function ConceptQuestions({
 
   return (
     <div className="bg-white rounded-xl shadow-md overflow-hidden h-full flex flex-col">
-      <div className="p-4 bg-blue-600 text-white">
+      <div className="p-4 bg-[#DE7356] text-white">
         <h2 className="text-xl font-semibold">Practice Problems</h2>
-        <p className="text-sm text-blue-100">{conceptName}</p>
+        <p className="text-sm text-white opacity-80">{conceptName}</p>
       </div>
 
       <div className="border-b border-gray-200 p-3 flex justify-between items-center">
@@ -145,7 +145,7 @@ export default function ConceptQuestions({
                         onClick={() => handleViewQuestion(question)}
                         className={`px-3 py-1 text-xs border rounded-md flex items-center ${
                           isQuestionViewed(question.id) 
-                            ? 'border-blue-300 text-blue-600 bg-blue-50 hover:bg-blue-100' 
+                            ? 'border-[#DE7356]/30 text-[#DE7356] bg-[#DE7356]/5 hover:bg-[#DE7356]/10' 
                             : 'border-gray-300 hover:bg-gray-50'
                         }`}
                       >
@@ -157,7 +157,7 @@ export default function ConceptQuestions({
                       </button>
                       <button
                         onClick={() => handleAskQuestion(question)}
-                        className="px-3 py-1 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center"
+                        className="px-3 py-1 text-xs bg-[#DE7356] text-white rounded-md hover:bg-[#C26B56] flex items-center"
                       >
                         <svg className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
