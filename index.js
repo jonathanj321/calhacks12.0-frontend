@@ -9,16 +9,18 @@ const fs      = require('fs');
 const { MongoClient, GridFSBucket } = require('mongodb');
 const Grid    = require('gridfs-stream');
 const { splitPDFIntoQuestions, saveSplitPDFs } = require('./pdfSplitter');
+const path = require('path');
 
 const app    = express();
 app.use(cors());                   // enable CORS for frontend access
 const upload = multer({ dest: 'uploads/' });
 
+// Serve static files (HTML, CSS, JS) from the root directory
+app.use(express.static(__dirname));
+console.log('Serving static files from:', __dirname);
+
 // Debug routes
 console.log('Setting up routes...');
-
-// Serve static files
-app.use(express.static(__dirname));
 
 // Serve the test page - original route
 app.get('/test', (req, res) => {
@@ -86,7 +88,7 @@ app.get('/test', (req, res) => {
                     if (result.files) {
                         resultDiv.textContent += '\\n\\nDownload links:\\n';
                         result.files.forEach(file => {
-                            resultDiv.textContent += \`\\nhttp://localhost:3000/file/\${file.filename}\`;
+                            resultDiv.textContent += \`\\nhttp://localhost:3001/file/\${file.filename}\`;
                         });
                     }
                 } catch (error) {
@@ -96,6 +98,43 @@ app.get('/test', (req, res) => {
         </script>
     </body>
     </html>
+    `);
+});
+
+// Serve the question viewer page
+app.get('/viewer', (req, res) => {
+    console.log('Question viewer accessed');
+    const viewerPath = path.resolve(__dirname, 'question-viewer.html');
+    console.log('Serving viewer from path:', viewerPath);
+    res.setHeader('Content-Type', 'text/html');
+    res.sendFile(viewerPath);
+});
+
+// Simple viewer for testing routes
+app.get('/viewer-simple', (req, res) => {
+    console.log('Simple viewer accessed');
+    const simplePath = path.resolve(__dirname, 'simple-viewer.html');
+    console.log('Serving simple viewer from path:', simplePath);
+    res.setHeader('Content-Type', 'text/html');
+    res.sendFile(simplePath);
+});
+
+// Also add a direct HTML response route
+app.get('/viewer-direct', (req, res) => {
+    console.log('Direct HTML viewer accessed');
+    res.setHeader('Content-Type', 'text/html');
+    res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Direct HTML Response</title>
+        </head>
+        <body>
+            <h1>Direct HTML Response Works!</h1>
+            <p>This HTML is sent directly in the response, not from a file.</p>
+            <p><a href="/test">Go to Test Upload Page</a></p>
+        </body>
+        </html>
     `);
 });
 
@@ -331,8 +370,70 @@ app.post('/upload', upload.single('file'), async (req, res) => {
 });
 
 // ─── 4) List metadata ─────────────────────────────────────────────────────────
+// Add a debug route to list all files in GridFS
+app.get('/files', async (req, res) => {
+  console.log('Getting list of all files');
+  
+  try {
+    const files = await gfsBucket.find({}).toArray();
+    
+    const fileInfo = files.map(file => ({
+      id: file._id.toString(),
+      filename: file.filename,
+      contentType: file.contentType,
+      size: file.length,
+      uploadDate: file.uploadDate,
+      metadata: file.metadata
+    }));
+    
+    res.json({ count: fileInfo.length, files: fileInfo });
+  } catch (error) {
+    console.error('Error listing files:', error);
+    res.status(500).json({ error: 'Could not list files' });
+  }
+});
+
+// Add a route to get questions from a specific homework file
+app.get('/homework/:hwNumber', async (req, res) => {
+  const hwNumber = req.params.hwNumber;
+  const prefix = `270HW${hwNumber}_question`;
+  
+  console.log(`Looking for questions in HW${hwNumber}`);
+  
+  try {
+    // Find all files that match the homework prefix
+    const files = await gfsBucket.find({
+      filename: { $regex: `^${prefix}` }
+    }).toArray();
+    
+    if (!files || files.length === 0) {
+      return res.status(404).json({ error: `No questions found for HW${hwNumber}` });
+    }
+    
+    // Return info about the questions
+    const questions = files.map(file => ({
+      id: file._id.toString(),
+      filename: file.filename,
+      questionNumber: file.metadata?.questionNumber || 0,
+      size: file.length,
+      downloadUrl: `/file/${file.filename}`
+    }));
+    
+    // Sort by question number
+    questions.sort((a, b) => a.questionNumber - b.questionNumber);
+    
+    res.json({
+      hwNumber,
+      questionCount: questions.length,
+      questions
+    });
+  } catch (error) {
+    console.error(`Error listing questions for HW${hwNumber}:`, error);
+    res.status(500).json({ error: 'Could not list questions' });
+  }
+});
+
 // ─── Download & stream a file by filename ────────────────────────────────────
-// ─── 5) Download & stream a file by filename (simplified) ────────────────
 app.get('/file/:filename', async (req, res) => {
     const filename = req.params.filename;
     console.log('📥 Download requested for', filename);
