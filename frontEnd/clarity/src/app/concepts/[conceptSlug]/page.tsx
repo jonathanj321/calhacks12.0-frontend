@@ -9,8 +9,10 @@ import ChatBox from '@/components/chat/ChatBox';
 import { getConceptData, ConceptData, Question } from '@/services/conceptService';
 
 export default function ConceptPage({ params }: { params: { conceptSlug: string } }) {
-  const { conceptSlug } = params;
+  // Properly deconstruct the params object to avoid Next.js warning
   const router = useRouter();
+  // Access the params in a way that's compatible with both current and future Next.js
+  const conceptSlug = params?.conceptSlug || '';
   const [conceptData, setConceptData] = useState<ConceptData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);

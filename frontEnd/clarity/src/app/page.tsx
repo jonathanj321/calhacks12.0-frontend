@@ -62,15 +62,19 @@ export default function Home() {
     : conceptsData.slice(0, 4);
 
   // Get all problems from all concepts
-  const allProblems = conceptsData.flatMap(concept => 
-    concept.questions.map(question => ({
+  const allProblems = conceptsData.flatMap(concept => {
+    // Find the slug that corresponds to this concept
+    const conceptSlug = recentConcepts.find(c => c.name === concept.name)?.slug || 
+                      concept.name.toLowerCase().replace(/\s+/g, '-');
+    
+    return concept.questions.map(question => ({
       id: question.id,
       title: question.title,
       difficulty: question.difficulty,
       concept: concept.name,
-      url: `/concepts/${concept.name.toLowerCase().replace(/\s+/g, '-')}`
-    }))
-  );
+      url: `/concepts/${conceptSlug}`
+    }));
+  });
 
   // Determine which problems to display
   const displayedProblems = showAllProblems

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { sendMessageToClaude, ChatMessage as ApiChatMessage } from '@/services/claudeService';
 
 type Message = {
   id: string;
@@ -16,6 +17,7 @@ export default function ChatBox({ conceptContext, questionContext }: ChatBoxProp
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [apiChatHistory, setApiChatHistory] = useState<ApiChatMessage[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Add initial bot message when concept changes
@@ -28,14 +30,20 @@ export default function ChatBox({ conceptContext, questionContext }: ChatBoxProp
         initialMessage = `I see you're looking at "${questionContext}" How can I help you with this problem?`;
       }
       
-      setMessages([
-        {
-          id: Date.now().toString(),
-          content: initialMessage,
-          sender: 'bot',
-          timestamp: new Date(),
-        },
-      ]);
+      const botMessage: Message = {
+        id: Date.now().toString(),
+        content: initialMessage,
+        sender: 'bot',
+        timestamp: new Date(),
+      };
+      
+      setMessages([botMessage]);
+      
+      // Add this message to the API chat history
+      setApiChatHistory([{
+        role: 'assistant',
+        content: initialMessage
+      }]);
     }
   }, [conceptContext, questionContext]);
 
@@ -59,30 +67,61 @@ export default function ChatBox({ conceptContext, questionContext }: ChatBoxProp
       timestamp: new Date(),
     };
     
+    // Add message to UI immediately
     setMessages(prev => [...prev, userMessage]);
     setInputValue('');
     setIsLoading(true);
     
-    // In a real implementation, this would call the Claude API
-    // For now, we'll simulate a response
-    setTimeout(() => {
-      let responseContent = `This is a simulated response about ${conceptContext || 'algorithms'} based on your question: "${inputValue}"`;
+    // Add user message to API chat history
+    const updatedChatHistory = [
+      ...apiChatHistory, 
+      { role: 'user', content: inputValue } as ApiChatMessage
+    ];
+    
+    try {
+      // Get context from props
+      const context = questionContext 
+        ? `${conceptContext}: ${questionContext}`
+        : conceptContext;
       
-      // Customize response if question context is available
-      if (questionContext) {
-        responseContent = `This is a simulated response about ${conceptContext}: "${questionContext}" based on your question: "${inputValue}"`;
-      }
+      // Call Claude API
+      const claudeResponse = await sendMessageToClaude(
+        inputValue,
+        apiChatHistory,
+        context
+      );
       
+      // Create bot message from Claude's response
       const botResponse: Message = {
-        id: (Date.now() + 1).toString(),
-        content: responseContent,
+        id: Date.now().toString(),
+        content: claudeResponse,
         sender: 'bot',
         timestamp: new Date(),
       };
       
+      // Update UI with bot response
       setMessages(prev => [...prev, botResponse]);
+      
+      // Update API chat history with both messages
+      setApiChatHistory([
+        ...updatedChatHistory,
+        { role: 'assistant', content: claudeResponse }
+      ]);
+    } catch (error) {
+      console.error('Error getting response from Claude:', error);
+      
+      // Add error message
+      const errorMessage: Message = {
+        id: Date.now().toString(),
+        content: "I'm sorry, I encountered an error. Please try again.",
+        sender: 'bot',
+        timestamp: new Date(),
+      };
+      
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (

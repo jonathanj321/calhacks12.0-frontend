@@ -156,9 +156,10 @@ export async function getAllConcepts(): Promise<{ slug: string; name: string }[]
   return new Promise((resolve) => {
     // Simulate network delay
     setTimeout(() => {
-      const concepts = Object.entries(conceptsData).map(([slug, data]) => ({
+      // Get the exact slugs as they appear in the conceptsData object keys
+      const concepts = Object.keys(conceptsData).map(slug => ({
         slug,
-        name: data.name
+        name: conceptsData[slug].name
       }));
       resolve(concepts);
     }, 300);
