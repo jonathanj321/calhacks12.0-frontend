@@ -8,8 +8,8 @@ const multer  = require('multer');
 const fs      = require('fs');
 const { MongoClient, GridFSBucket } = require('mongodb');
 const Grid    = require('gridfs-stream');
-const { splitPDFIntoQuestions, saveSplitPDFs } = require('./pdfSplitter');
 const path = require('path');
+const mongoDataApi = require('./mongoDataApi');
 
 const app    = express();
 app.use(cors());                   // enable CORS for frontend access
@@ -217,24 +217,81 @@ app.get('/uploader', (req, res) => {
     `);
 });
 
+// Initialize defaults for MongoDB-related variables
 let gfs, gfsBucket;
+let mongoConnected = false;
 
-// ─── 1) Connect & init GridFS ───────────────────────────────────────────────
-MongoClient.connect(process.env.MONGO_URI)
-  .then(client => {
-    const db        = client.db();
-    gfsBucket       = new GridFSBucket(db, { bucketName: 'pdfs' });
-    gfs             = Grid(db, MongoClient);
-    gfs.collection('pdfs');
-    console.log('✅ Connected to MongoDB');
-  })
-  .catch(err => {
-    console.error('❌ Mongo connection error:', err);
-    process.exit(1);
-  });
+// Use a more resilient MongoDB connection approach
+try {
+  // Try to connect to MongoDB if URI is provided
+  if (process.env.MONGO_URI) {
+    console.log('Attempting to connect to MongoDB...');
+    MongoClient.connect(process.env.MONGO_URI)
+      .then(client => {
+        const db = client.db();
+        gfsBucket = new GridFSBucket(db, { bucketName: 'pdfs' });
+        gfs = Grid(db, MongoClient);
+        gfs.collection('pdfs');
+        mongoConnected = true;
+        console.log('✅ Connected to MongoDB');
+      })
+      .catch(err => {
+        console.error('❌ MongoDB connection error:', err);
+        console.log('⚠️ Running with limited functionality (database features disabled)');
+        // Set up empty mock functions for MongoDB-related functionality
+        setupMocks();
+      });
+  } else {
+    console.log('❗ No MongoDB URI provided in environment variables');
+    console.log('⚠️ Running with limited functionality (database features disabled)');
+    // Set up empty mock functions for MongoDB-related functionality
+    setupMocks();
+  }
+} catch (error) {
+  console.error('❌ Error in MongoDB setup:', error);
+  console.log('⚠️ Running with limited functionality (database features disabled)');
+  // Set up empty mock functions for MongoDB-related functionality
+  setupMocks();
+}
+
+// Set up mock functions when MongoDB is not available
+function setupMocks() {
+  // Create empty bucket with mock functions
+  gfsBucket = {
+    find: () => ({ 
+      toArray: async () => [] 
+    }),
+    openUploadStream: () => ({
+      id: 'mock-id',
+      on: () => {}
+    }),
+    openDownloadStream: () => ({
+      on: (event, callback) => {
+        if (event === 'error') {
+          callback(new Error('MongoDB not connected'));
+        }
+        return { pipe: () => {} };
+      },
+      pipe: () => {}
+    })
+  };
+  
+  gfs = {
+    collection: () => {}
+  };
+}
 
 // ─── 2) Health check ─────────────────────────────────────────────────────────
 app.get('/', (_req, res) => res.send('Server is up'));
+
+// Add a MongoDB connection status endpoint
+app.get('/status', (_req, res) => {
+  res.json({
+    server: 'up',
+    mongodb: mongoConnected ? 'connected' : 'disconnected',
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
 
 // ─── 3) Upload endpoint ───────────────────────────────────────────────────────
 app.post('/upload', upload.single('file'), async (req, res) => {
@@ -246,115 +303,25 @@ app.post('/upload', upload.single('file'), async (req, res) => {
   console.log('Received file:', { originalname, mimetype, tempPath });
   
   try {
-    // Check if this is a question file (you can adjust this condition)
-    const isQuestionFile = originalname.toLowerCase().includes('hw') || 
-                          originalname.toLowerCase().includes('question');
-    
-    console.log('Is question file:', isQuestionFile);
-    
-    if (isQuestionFile) {
-      // Read the file
-      console.log('Reading file from:', tempPath);
-      let fileBuffer;
-      try {
-        fileBuffer = await fs.promises.readFile(tempPath);
-        console.log('File read successfully, size:', fileBuffer.length);
-        
-        // Verify it's a PDF by checking the first few bytes
-        const pdfHeader = fileBuffer.slice(0, 5).toString();
-        if (!pdfHeader.startsWith('%PDF-')) {
-          throw new Error('Invalid PDF file: Missing PDF header');
-        }
-      } catch (readError) {
-        console.error('Error reading file:', readError);
-        throw new Error('Failed to read file: ' + readError.message);
-      }
-      
-      // Split the PDF into individual questions
-      console.log('Splitting PDF into questions...');
-      const questionPDFs = await splitPDFIntoQuestions(fileBuffer, originalname);
-      console.log('PDF split successfully into', questionPDFs.length, 'questions');
-      
-      // Save the split PDFs temporarily
-      console.log('Saving split PDFs temporarily...');
-      const tempFiles = await saveSplitPDFs(questionPDFs);
-      console.log('Temporary files saved:', tempFiles);
-      
-      // Upload each question to GridFS
-      const uploadedFiles = [];
-      for (let i = 0; i < questionPDFs.length; i++) {
-        const question = questionPDFs[i];
-        console.log(`Uploading question ${i + 1}/${questionPDFs.length}: ${question.filename}`);
-        
-        const uploadStream = gfsBucket.openUploadStream(question.filename, {
-          contentType: mimetype,
-          metadata: { 
-            uploadedAt: new Date(),
-            originalFile: originalname,
-            questionNumber: i + 1
-          }
-        });
-        
-        await new Promise((resolve, reject) => {
-          const readStream = fs.createReadStream(tempFiles[i]);
-          readStream
-            .pipe(uploadStream)
-            .on('error', (err) => {
-              console.error('Error uploading to GridFS:', err);
-              reject(err);
-            })
-            .on('finish', () => {
-              console.log(`Successfully uploaded ${question.filename}`);
-              uploadedFiles.push({
-                fileId: uploadStream.id,
-                filename: question.filename
-              });
-              resolve();
-            });
-        });
-        
-        // Clean up temporary file
-        try {
-          await fs.promises.unlink(tempFiles[i]);
-          console.log(`Cleaned up temporary file: ${tempFiles[i]}`);
-        } catch (unlinkError) {
-          console.error(`Error cleaning up temporary file ${tempFiles[i]}:`, unlinkError);
-        }
-      }
-      
-      // Clean up original temporary file
-      try {
-        await fs.promises.unlink(tempPath);
-        console.log('Cleaned up original temporary file');
-      } catch (unlinkError) {
-        console.error('Error cleaning up original temporary file:', unlinkError);
-      }
-      
-      res.json({ 
-        message: 'Questions split and uploaded successfully',
-        files: uploadedFiles
-      });
-    } else {
-      // Handle regular file upload (existing code)
-      const uploadStream = gfsBucket.openUploadStream(originalname, {
-        contentType: mimetype,
-        metadata: { uploadedAt: new Date() }
-      });
-      const fileId = uploadStream.id;
+    // Simple file upload without PDF splitting
+    const uploadStream = gfsBucket.openUploadStream(originalname, {
+      contentType: mimetype,
+      metadata: { uploadedAt: new Date() }
+    });
+    const fileId = uploadStream.id;
 
-      fs.createReadStream(tempPath)
-        .pipe(uploadStream)
-        .on('error', err => {
-          console.error('🔴 GridFS upload error:', err);
-          res.sendStatus(500);
-        })
-        .on('finish', () => {
-          fs.unlink(tempPath, unlinkErr => {
-            if (unlinkErr) console.error('Temp file cleanup error:', unlinkErr);
-          });
-          res.json({ fileId, filename: originalname });
+    fs.createReadStream(tempPath)
+      .pipe(uploadStream)
+      .on('error', err => {
+        console.error('🔴 GridFS upload error:', err);
+        res.sendStatus(500);
+      })
+      .on('finish', () => {
+        fs.unlink(tempPath, unlinkErr => {
+          if (unlinkErr) console.error('Temp file cleanup error:', unlinkErr);
         });
-    }
+        res.json({ fileId, filename: originalname });
+      });
   } catch (error) {
     console.error('Error processing file:', error);
     console.error('Error details:', {
@@ -369,7 +336,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
   }
 });
 
-// ─── 4) List metadata ─────────────────────────────────────────────────────────
+// ─── 4) List metadata ─────────────────────────────────────────────────────────────
 // Add a debug route to list all files in GridFS
 app.get('/files', async (req, res) => {
   console.log('Getting list of all files');
@@ -389,6 +356,29 @@ app.get('/files', async (req, res) => {
     res.json({ count: fileInfo.length, files: fileInfo });
   } catch (error) {
     console.error('Error listing files:', error);
+    res.status(500).json({ error: 'Could not list files' });
+  }
+});
+
+// Map the /api/files endpoint to the existing /files endpoint
+app.get('/api/files', async (req, res) => {
+  console.log('API: Getting list of all files via existing endpoint');
+  
+  try {
+    const files = await gfsBucket.find({}).toArray();
+    
+    const fileInfo = files.map(file => ({
+      id: file._id.toString(),
+      filename: file.filename,
+      contentType: file.contentType,
+      size: file.length,
+      uploadDate: file.uploadDate,
+      metadata: file.metadata
+    }));
+    
+    res.json({ count: fileInfo.length, files: fileInfo });
+  } catch (error) {
+    console.error('Error listing files via API:', error);
     res.status(500).json({ error: 'Could not list files' });
   }
 });
@@ -433,6 +423,113 @@ app.get('/homework/:hwNumber', async (req, res) => {
   }
 });
 
+// API route to get homework questions
+app.get('/api/homework/:hwNumber', async (req, res) => {
+  const hwNumber = req.params.hwNumber;
+  
+  console.log(`API: Looking for questions in HW${hwNumber}`);
+  
+  try {
+    // Find all files that match the homework prefix
+    const prefix = `270HW${hwNumber}_question`;
+    const files = await gfsBucket.find({
+      filename: { $regex: `^${prefix}` }
+    }).toArray();
+    
+    if (!files || files.length === 0) {
+      return res.status(404).json({ error: `No questions found for HW${hwNumber}` });
+    }
+    
+    // Return info about the questions
+    const questions = files.map(file => ({
+      id: file._id.toString(),
+      filename: file.filename,
+      questionNumber: file.metadata?.questionNumber || 0,
+      size: file.length,
+      downloadUrl: `/api/file/${file.filename}`
+    }));
+    
+    // Sort by question number
+    questions.sort((a, b) => a.questionNumber - b.questionNumber);
+    
+    res.json({
+      hwNumber,
+      questionCount: questions.length,
+      questions
+    });
+  } catch (error) {
+    console.error(`Error listing questions for HW${hwNumber} via API:`, error);
+    res.status(500).json({ error: 'Could not list questions' });
+  }
+});
+
+// API route to get file metadata
+app.get('/api/file-info/:filename', async (req, res) => {
+  const filename = req.params.filename;
+  console.log('API: Getting file info for', filename);
+  
+  try {
+    const files = await gfsBucket.find({ filename }).toArray();
+    
+    if (!files || files.length === 0) {
+      return res.status(404).json({ error: 'File not found' });
+    }
+    
+    const file = files[0];
+    
+    res.json({
+      id: file._id.toString(),
+      filename: file.filename,
+      contentType: file.contentType,
+      size: file.length,
+      uploadDate: file.uploadDate,
+      metadata: file.metadata,
+      downloadUrl: `/api/file/${file.filename}`
+    });
+  } catch (error) {
+    console.error('Error getting file info via API:', error);
+    res.status(500).json({ error: 'Could not get file info' });
+  }
+});
+
+// For file content route
+app.get('/api/file/:filename', async (req, res) => {
+  const filename = req.params.filename;
+  console.log('API: Download requested for', filename);
+
+  try {
+    // Find the file in GridFS
+    const files = await gfsBucket.find({ filename }).toArray();
+    
+    if (!files || files.length === 0) {
+      console.warn('⚠️ File not found in GridFS:', filename);
+      return res.status(404).send('Not found');
+    }
+    
+    const file = files[0];
+    console.log('✔️ Found file in DB:', file.filename, 'size=', file.length);
+
+    // Set response headers
+    res.setHeader('Content-Type', file.contentType);
+    res.setHeader('Content-Length', file.length);
+    res.setHeader('Content-Disposition', `inline; filename="${file.filename}"`);
+
+    // Stream the file data
+    const downloadStream = gfsBucket.openDownloadStream(file._id);
+    downloadStream
+      .on('error', err => {
+        console.error('🔴 GridFS download error:', err);
+        if (!res.headersSent) res.sendStatus(500);
+        else res.end();
+      })
+      .pipe(res);
+  } catch (err) {
+    console.error('❌ Error in API download handler:', err);
+    if (!res.headersSent) res.sendStatus(500);
+    else res.end();
+  }
+});
+
 // ─── Download & stream a file by filename ────────────────────────────────────
 app.get('/file/:filename', async (req, res) => {
     const filename = req.params.filename;
@@ -473,10 +570,8 @@ app.get('/file/:filename', async (req, res) => {
       else res.end();
     }
   });
-  
-  
-  
 
+  
 // ─── 6) Start the server ───────────────────────────────────────────────────────
 const PORT = 3001; // Force port 3001 without checking process.env.PORT
 app.listen(PORT, () => console.log(`🚀 Listening on http://localhost:${PORT}`));
