@@ -2,98 +2,48 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 
-// --- Inline SVG Icons (Replaced lucide-react) ---
-// ... (SVG components remain unchanged) ...
+// --- Inline SVG Icons ---
 const IconCheck = ({ className }: { className?: string }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
     <path d="M20 6 9 17l-5-5" />
   </svg>
 );
 
 const IconCamera = ({ className }: { className?: string }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
     <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
     <circle cx="12" cy="13" r="3" />
   </svg>
 );
 
 const IconMic = ({ className }: { className?: string }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
     <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
     <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
     <line x1="12" x2="12" y1="19" y2="22" />
   </svg>
 );
 
-const IconStopCircle = ({ className }: { className?: string }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <circle cx="12" cy="12" r="10" />
-    <rect width="6" height="6" x="9" y="9" />
-  </svg>
+const IconWifi = ({ className }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M5 12.55a11 11 0 0 1 14.08 0" />
+      <path d="M1.42 9a16 16 0 0 1 21.16 0" />
+      <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
+      <line x1="12" x2="12.01" y1="20" y2="20" />
+    </svg>
 );
 
-const IconRadio = ({ className }: { className?: string }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <circle cx="12" cy="12" r="2" />
-    <path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48 0a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14" />
-  </svg>
+const IconWifiOff = ({ className }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <line x1="1" x2="23" y1="1" y2="23" />
+      <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55" />
+      <path d="M5 12.55a11 11 0 0 1 5.17-2.39" />
+      <path d="M10.71 5.05A16 16 0 0 1 22.58 9" />
+      <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88" />
+      <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
+      <line x1="12" x2="12.01" y1="20" y2="20" />
+    </svg>
 );
-
 // --- End SVG Icons ---
 
 // A simple in-page modal component
@@ -115,117 +65,41 @@ const Modal = ({ message, onClose }: { message: string, onClose: () => void }) =
   </div>
 );
 
-export default function CapturesPage() {
+/**
+ * This component now acts as a "viewer" or "listener".
+ * It connects to the backend and ONLY receives transcript updates.
+ * The video element is a placeholder, waiting for a video stream (e.g., WebRTC or HLS).
+ */
+export default function App() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const mediaStreamRef = useRef<MediaStream | null>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const [isCameraOn, setIsCameraOn] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
-  const [isTranscribing, setIsTranscribing] = useState(false);
+  const webSocketRef = useRef<WebSocket | null>(null);
+
+  const [isConnected, setIsConnected] = useState(false);
   const [transcription, setTranscription] = useState('');
+  const [interimText, setInterimText] = useState('');
   const [modalMessage, setModalMessage] = useState<string | null>(null);
-  const [screenshots, setScreenshots] = useState<string[]>([]); // To store screenshot URLs
+  const [screenshots, setScreenshots] = useState<string[]>([]);
 
-  // --- Backend Placeholder Functions ---
-
-  /**
-   * Placeholder: Uploads the recorded video blob to the backend/storage.
-   */
-  const uploadRecording = async (videoBlob: Blob) => {
-    console.log('Uploading recording...', videoBlob);
-    // In a real app, you'd use fetch() to POST this blob to your backend.
-    // ...
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    console.log('Upload complete');
-    setModalMessage('Video recording saved and uploaded successfully!');
-  };
-
-  /**
-   * Placeholder: Uploads the screenshot blob to the backend/storage.
-   */
+  // --- Placeholder for uploading screenshot ---
   const uploadScreenshot = async (imageBlob: Blob | null) => {
     if (!imageBlob) return;
     console.log('Uploading screenshot...', imageBlob);
-    // ...
     await new Promise(resolve => setTimeout(resolve, 1000));
     console.log('Upload complete');
     setModalMessage('Screenshot saved and uploaded successfully!');
   };
 
-  /**
-   * Placeholder: Sends an audio chunk for live transcription.
-   */
-  const handleTranscriptionData = (audioChunk: Blob) => {
-    console.log('Sending audio chunk for transcription...', audioChunk);
-    // ...
-
-    // --- MOCK TRANSCRIPTION ---
-    const mockTranscriptions = ["Hello, this is a test.", "Welcome to the lecture.", "We are discussing...", "This is important."];
-    const newText = mockTranscriptions[Math.floor(Math.random() * mockTranscriptions.length)];
-    setTranscription(prev => prev + newText + ' ');
-  };
-
-  // --- Core Media Functions ---
-
-  const toggleCamera = async () => {
-    if (isCameraOn) {
-      // Turn camera off
-      mediaStreamRef.current?.getTracks().forEach(track => track.stop());
-      if (videoRef.current) videoRef.current.srcObject = null;
-      mediaStreamRef.current = null;
-      setIsCameraOn(false);
-      setIsRecording(false);
-      setIsTranscribing(false);
-    } else {
-      // Turn camera on
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        mediaStreamRef.current = stream;
-        if (videoRef.current) videoRef.current.srcObject = stream;
-        setIsCameraOn(true);
-      } catch (err) {
-        console.error('Error accessing media devices. Please check permissions.', err);
-      }
-    }
-  };
-
-  const toggleRecording = () => {
-    if (isRecording) {
-      // Stop recording
-      mediaRecorderRef.current?.stop();
-      setIsRecording(false);
-    } else {
-      // Start recording
-      if (!mediaStreamRef.current) {
-        console.warn('Please turn on the camera first.');
-        return;
-      }
-      
-      const recordedChunks: Blob[] = [];
-      mediaRecorderRef.current = new MediaRecorder(mediaStreamRef.current, {
-        mimeType: 'video/webm'
-      });
-
-      mediaRecorderRef.current.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          recordedChunks.push(event.data);
-        }
-      };
-
-      mediaRecorderRef.current.onstop = () => {
-        const videoBlob = new Blob(recordedChunks, { type: 'video/webm' });
-        uploadRecording(videoBlob);
-      };
-
-      mediaRecorderRef.current.start();
-      setIsRecording(true);
-    }
-  };
-
-  // Take a Screenshot
+  // --- Take a Screenshot of the Video Element ---
   const takeScreenshot = () => {
     if (!videoRef.current) {
-      console.warn('Please turn on the camera first.');
+      console.warn('Video element not available.');
+      return;
+    }
+    
+    // Check if video has content
+    if (videoRef.current.readyState < 1 || videoRef.current.videoWidth === 0) {
+      console.warn('Video stream not active or loaded, cannot take screenshot.');
+      setModalMessage('Video stream is not active.');
       return;
     }
 
@@ -238,10 +112,7 @@ export default function CapturesPage() {
       ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
       canvas.toBlob((blob) => {
         if (blob) {
-          // Upload to backend
-          uploadScreenshot(blob);
-          
-          // Create a local URL to display the screenshot immediately
+          uploadScreenshot(blob); // Upload to backend (placeholder)
           const url = URL.createObjectURL(blob);
           setScreenshots(prev => [...prev, url]);
         }
@@ -249,44 +120,66 @@ export default function CapturesPage() {
     }
   };
 
-  const toggleTranscription = () => {
-    if (isTranscribing) {
-      // Stop transcription
-      setIsTranscribing(false);
-      console.log('Stopped transcription.');
-    } else {
-      // Start transcription
-      if (!mediaStreamRef.current) {
-        console.warn('Please turn on the camera first.');
-        return;
-      }
-      
-      setIsTranscribing(true);
-      setTranscription('Starting live transcription... ');
-      console.log('Started transcription (simulation).');
-      
-      // MOCK: Simulate receiving transcription data
-      const interval = setInterval(() => {
-        if (!isTranscribing) { // Check if it was stopped
-           clearInterval(interval);
-           return;
-        }
-        handleTranscriptionData(new Blob()); 
-      }, 3000);
-      
-      mediaRecorderRef.current?.addEventListener('stop', () => clearInterval(interval), { once: true });
+  // --- WebSocket Connection Logic ---
+  const connectWebSocket = () => {
+    // Disconnect if already connected
+    if (webSocketRef.current) {
+      webSocketRef.current.close();
     }
-  };
-  
-  // Cleanup
-  useEffect(() => {
-    // This function is called when the component unmounts
-    return () => {
-      mediaStreamRef.current?.getTracks().forEach(track => track.stop());
-      // Revoke object URLs to prevent memory leaks
-      screenshots.forEach(url => URL.revokeObjectURL(url));
+
+    // NOTE: Replace with your deployed backend URL
+    const ws = new WebSocket('ws://localhost:3000/api/clients');
+    webSocketRef.current = ws;
+
+    ws.onopen = () => {
+      console.log('Connected to backend transcript server.');
+      setIsConnected(true);
+      setTranscription('');
+      setInterimText('Listening for audio stream...');
     };
-  }, [screenshots]); // Dependency on screenshots to clean up old URLs
+
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.type === 'transcript_update') {
+          const newText = data.text;
+          
+          if (data.is_final) {
+            setTranscription(prev => prev + newText + ' ');
+            setInterimText('');
+          } else {
+            setInterimText(newText);
+          }
+        }
+      } catch (e) {
+        console.error("Error parsing WebSocket message:", e);
+      }
+    };
+
+    ws.onerror = (e) => {
+      console.error('WebSocket Error:', e);
+      setInterimText('[CONNECTION ERROR]');
+      setIsConnected(false);
+    };
+
+    ws.onclose = () => {
+      console.log('WebSocket closed.');
+      if (isConnected) { // Only show disconnected if it was previously connected
+        setInterimText('Disconnected from stream.');
+      }
+      setIsConnected(false);
+    };
+  };
+
+  // Connect on mount and handle cleanup
+  useEffect(() => {
+    connectWebSocket(); // Connect when component loads
+
+    return () => {
+      webSocketRef.current?.close(); // Disconnect on unmount
+      screenshots.forEach(url => URL.revokeObjectURL(url)); // Cleanup screenshot URLs
+    };
+  }, [screenshots]); // Re-run effect if screenshots change (for cleanup)
 
   return (
     <div className="p-6 md:p-10 space-y-6 bg-gray-50 min-h-screen">
@@ -295,46 +188,29 @@ export default function CapturesPage() {
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Main Content (Left) */}
         <div className="flex-1 space-y-6">
-          <h1 className="text-3xl font-bold text-gray-900">Live Capture</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Live Stream Viewer</h1>
           
           {/* Video Preview */}
           <div className="bg-black rounded-lg shadow-md overflow-hidden aspect-video max-w-4xl mx-auto relative">
+            {/* This video element is now a PLACEHOLDER.
+              You will need a video streaming solution (like WebRTC or HLS)
+              to send a video feed from your phone to this element.
+              The backend we built only handles AUDIO for transcription.
+            */}
             <video ref={videoRef} autoPlay muted playsInline className="w-full h-full object-cover"></video>
-            {!isCameraOn && (
-              <div className="absolute inset-0 flex items-center justify-center flex-col text-gray-400">
-                <IconCamera className="w-16 h-16" />
-                <p className="mt-2">Camera is off</p>
-              </div>
-            )}
+            
+            {/* Static placeholder text */}
+            <div className="absolute inset-0 flex items-center justify-center flex-col text-gray-400 pointer-events-none">
+              <IconCamera className="w-16 h-16" />
+              <p className="mt-2">Video stream will appear here...</p>
+            </div>
           </div>
 
           {/* Control Buttons */}
           <div className="flex flex-wrap gap-4 items-center justify-center max-w-4xl mx-auto">
             <button
-              onClick={toggleCamera}
-              className={`flex items-center justify-center gap-2 px-5 py-3 rounded-md font-medium text-white shadow-sm transition-colors
-                ${isCameraOn ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'}`}
-            >
-              {isCameraOn ? <IconStopCircle className="w-5 h-5" /> : <IconCamera className="w-5 h-5" />}
-              {isCameraOn ? 'Stop Camera' : 'Start Camera'}
-            </button>
-
-            <button
-              onClick={toggleRecording}
-              disabled={!isCameraOn}
-              className={`flex items-center justify-center gap-2 px-5 py-3 rounded-md font-medium text-white shadow-sm transition-colors
-                ${isRecording ? 'bg-red-600 hover:bg-red-700' : 'bg-indigo-600 hover:bg-indigo-700'}
-                ${!isCameraOn ? 'bg-gray-400 cursor-not-allowed' : ''}`}
-            >
-              {isRecording ? <IconStopCircle className="w-5 h-5" /> : <IconRadio className="w-5 h-5" />}
-              {isRecording ? 'Stop Recording' : 'Start Recording'}
-            </button>
-
-            <button
               onClick={takeScreenshot}
-              disabled={!isCameraOn}
-              className={`flex items-center justify-center gap-2 px-5 py-3 rounded-md font-medium text-white shadow-sm transition-colors bg-blue-600 hover:bg-blue-700
-                ${!isCameraOn ? 'bg-gray-400 cursor-not-allowed' : ''}`}
+              className="flex items-center justify-center gap-2 px-5 py-3 rounded-md font-medium text-white shadow-sm transition-colors bg-blue-600 hover:bg-blue-700"
             >
               <IconCamera className="w-5 h-5" />
               Take Screenshot
@@ -361,19 +237,27 @@ export default function CapturesPage() {
         {/* Sidebar (Right) - Live Transcription */}
         <div className="w-full lg:w-full lg:max-w-sm space-y-4">
           <h2 className="text-2xl font-semibold text-gray-800">Live Transcription</h2>
+          
+          {/* Connection Status Button */}
           <button
-            onClick={toggleTranscription}
-            disabled={!isCameraOn}
+            onClick={connectWebSocket} // Re-connect if disconnected
             className={`flex items-center justify-center gap-2 px-5 py-3 rounded-md font-medium text-white shadow-sm transition-colors w-full
-              ${isTranscribing ? 'bg-red-600 hover:bg-red-700' : 'bg-purple-600 hover:bg-purple-700'}
-              ${!isCameraOn ? 'bg-gray-400 cursor-not-allowed' : ''}`}
+              ${isConnected ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'}`}
           >
-            <IconMic className="w-5 h-5" />
-            {isTranscribing ? 'Stop Transcription' : 'Start Live Transcription'}
+            {isConnected ? <IconWifi className="w-5 h-5" /> : <IconWifiOff className="w-5 h-5" />}
+            {isConnected ? 'Connected to Stream' : 'Disconnected (Click to Reconnect)'}
           </button>
+          
+          {/* Transcription Output */}
           <div className="w-full bg-white p-4 rounded-lg shadow-md border border-gray-200 h-[400px] lg:h-[calc(100vh-200px)] overflow-y-auto">
             <p className="text-gray-700 whitespace-pre-wrap">
-              {transcription || <span className="text-gray-400">Transcription will appear here...</span>}
+              {/* Display the accumulated final text */}
+              {transcription}
+              
+              {/* Display the current, non-final (interim) text */}
+              <span className="text-gray-400 italic">
+                {interimText}
+              </span>
             </p>
           </div>
         </div>
