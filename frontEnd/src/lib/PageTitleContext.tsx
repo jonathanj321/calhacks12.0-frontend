@@ -1,4 +1,4 @@
-// frontend/lib/PageTitleContext.tsx
+// frontend/src/lib/PageTitleContext.tsx
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';

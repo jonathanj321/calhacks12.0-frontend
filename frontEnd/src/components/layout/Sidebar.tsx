@@ -104,7 +104,7 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
           </svg>
           {/* Title (hidden when collapsed) */}
           {/* Fixed missing quotes */}
-          <h1 className={`text-xl font-semibold text-gray-800 whitespace-nowrap overflow-hidden ${isCollapsed ? 'w-0 opacity-0 ml-0 transition-all duration-200' : 'w-auto opacity-100 ml-2 transition-all duration-300 delay-150'}`}>FillerName</h1>
+          <h1 className={`text-xl font-semibold text-gray-800 whitespace-nowrap overflow-hidden ${isCollapsed ? 'w-0 opacity-0 ml-0 transition-all duration-200' : 'w-auto opacity-100 ml-2 transition-all duration-300 delay-150'}`}>Kanting</h1>
         </div>
         
         {/* Toggle Button (Removed from here) */}

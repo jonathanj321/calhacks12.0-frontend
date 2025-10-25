@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import { usePageTitle } from '@/lib/PageTitleContext';
 
 // --- Inline SVG Icons ---
 const IconCheck = ({ className }: { className?: string }) => (
@@ -71,6 +72,7 @@ const Modal = ({ message, onClose }: { message: string, onClose: () => void }) =
  * It connects to the backend and ONLY receives transcript updates.
  */
 export default function App() {
+  const { setPageTitle } = usePageTitle();
   const webSocketRef = useRef<WebSocket | null>(null);
 
   const [isConnected, setIsConnected] = useState(false);
@@ -135,6 +137,7 @@ export default function App() {
 
   // Connect on mount and handle cleanup
   useEffect(() => {
+    setPageTitle('Live Recording'); // Set the page title
     connectWebSocket(); // Connect when component loads
 
     // In a real app, you would fetch existing screenshots here
@@ -154,9 +157,6 @@ export default function App() {
   return (
     <div className="p-6 md:p-10 space-y-6 bg-gray-50 min-h-screen">
       {modalMessage && <Modal message={modalMessage} onClose={() => setModalMessage(null)} />}
-      
-      {/* Title */}
-      <h1 className="text-3xl font-bold text-gray-900">Live Recording</h1>
       
       {/* Main Content Area: Key Visuals and Transcription */}
       <div className="flex flex-col lg:flex-row gap-6">

@@ -1,5 +1,7 @@
 'use client';
 
+import { usePageTitle } from '@/lib/PageTitleContext';
+
 // --- Inline SVG Icons ---
 // IconMenu component removed
 const IconBell = ({ className }: { className?: string }) => (
@@ -11,13 +13,15 @@ const IconBell = ({ className }: { className?: string }) => (
 
 // type HeaderProps removed, as no props are needed
 export default function Header() {
+  const { pageTitle } = usePageTitle();
+
   return (
     <header className="bg-gray-100 border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           <div className="flex items-center">
             {/* Page Title */}
-            <h1 className="text-xl font-semibold text-gray-800"></h1>
+            <h1 className="text-xl font-semibold text-gray-800">{pageTitle}</h1>
           </div>
           
           {/* Right-side Icons */}
