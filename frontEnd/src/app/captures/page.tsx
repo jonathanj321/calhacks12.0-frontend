@@ -5,6 +5,7 @@ import React from 'react';
  * It displays a header and a grid of video placeholders.
  * Per project conventions, it is exported as the default 'App' component.
  */
+
 export default function App() {
   
   // An array of mock video data to demonstrate the layout
