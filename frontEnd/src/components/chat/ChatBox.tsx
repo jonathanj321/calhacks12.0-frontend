@@ -73,7 +73,7 @@ export default function ChatBox({}: ChatBoxProps) {
       const claudeResponse = await sendMessageToClaude(
         inputValue,
         apiChatHistory,
-        "general algorithms and computer science"
+        "summarizing notes and past presentations for user queries"
       );
       
       // Create bot message from Claude's response
@@ -112,7 +112,7 @@ export default function ChatBox({}: ChatBoxProps) {
   return (
     <div className="h-96 border border-gray-300 rounded-xl flex flex-col bg-gray-50">
       <div className="p-4 bg-[#DE7356] text-white rounded-t-xl">
-        <h3 className="font-medium">Chatbot Assistant</h3>
+        <h3 className="font-medium">Meet Kant! Your Recall Assistant</h3>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
