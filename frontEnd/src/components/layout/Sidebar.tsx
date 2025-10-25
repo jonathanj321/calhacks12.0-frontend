@@ -74,34 +74,13 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
       <div className="h-16 flex items-center border-b border-gray-200 bg-gray-50 px-4">
         {/* Fixed missing quotes */}
         <div className={`flex items-center overflow-hidden ${isCollapsed ? 'justify-center w-full' : ''}`}>
-          {/* Logo */}
-          <svg 
-            viewBox="0 0 200 200" 
-            xmlns="http://www.w3.org/2000/svg"
-            className="w-8 h-8 flex-shrink-0" // <-- Your existing classes size the SVG
-          >
-            {/* Outer eye shape - deep orange */}
-            <path 
-              d="M25 100C25 100 50 50 100 50C150 50 175 100 175 100C175 100 150 150 100 150C50 150 25 100 25 100Z" 
-              className="fill-orange-600 stroke-orange-600" 
-              strokeWidth="4"
-            />
-            {/* Iris - mid orange */}
-            <circle 
-              cx="100" 
-              cy="100" 
-              r="30" 
-              className="fill-orange-400 stroke-orange-300" 
-              strokeWidth="4"
-            />
-            {/* Pupil/Highlight - light orange */}
-            <circle 
-              cx="100" 
-              cy="100" 
-              r="12" 
-              className="fill-orange-200"
-            />
-          </svg>
+          <header>
+              {/* Logo */}
+              <img 
+                src="kantinglogo-crop.png" 
+                alt="Startup Logo" 
+                className="w-8 h-8 flex-shrink-0"              />
+          </header>
           {/* Title (hidden when collapsed) */}
           {/* Fixed missing quotes */}
           <h1 className={`text-xl font-semibold text-gray-800 whitespace-nowrap overflow-hidden ${isCollapsed ? 'w-0 opacity-0 ml-0 transition-all duration-200' : 'w-auto opacity-100 ml-2 transition-all duration-300 delay-150'}`}>Kanting</h1>

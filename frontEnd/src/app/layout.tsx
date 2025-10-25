@@ -16,9 +16,6 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Kanting - Audio Visual Summarization",
   description: "Interactive platform for learning algorithms and data structures",
-  icons: {
-    icon: "/clarity-logo.png",
-  },
 };
 
 export default function RootLayout({
