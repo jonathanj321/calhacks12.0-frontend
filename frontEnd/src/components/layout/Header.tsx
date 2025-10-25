@@ -17,7 +17,7 @@ export default function Header() {
         <div className="flex justify-between h-16 items-center">
           <div className="flex items-center">
             {/* Page Title */}
-            <h1 className="text-xl font-semibold text-gray-800">Dashboard</h1>
+            <h1 className="text-xl font-semibold text-gray-800"></h1>
           </div>
           
           {/* Right-side Icons */}

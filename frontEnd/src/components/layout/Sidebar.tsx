@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import Link from 'next/link'
-// Using standard <a> and <img> tags to avoid build errors
+import React, { useState } from 'react';
+// Import Link and usePathname
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 // --- Inline SVG Icons ---
 const IconDashboard = ({ className }: { className?: string }) => (
@@ -39,21 +40,20 @@ type SidebarProps = {
 };
 
 export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
-  const [pathname, setPathname] = useState('/');
-  const [isClient, setIsClient] = useState(false);
+  // --- MODIFICATION ---
+  // Use the usePathname hook from Next.js
+  // This hook will always have the current path, even after client-side navigation
+  const pathname = usePathname();
+  // We no longer need isClient or useEffect for this
+  // --- END MODIFICATION ---
 
-  useEffect(() => {
-    // Set client-side-only values
-    setPathname(window.location.pathname);
-    setIsClient(true);
-  }, []);
 
   // --- MODIFIED FUNCTION ---
   // This function now returns the full layout classes on the initial render
   // to prevent the "resize" glitch on page load.
   const getLinkClass = (path: string) => {
-    // Determine active state, defaulting to false if not on client yet
-    const isActive = isClient && pathname === path;
+    // Determine active state using the pathname from the hook
+    const isActive = pathname === path;
 
     // Apply the *full* styling on the initial render
     // This prevents the layout shift (the "glitch")
@@ -68,9 +68,11 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
   // --- END MODIFICATION ---
 
   return (
+    // Fixed missing quotes
     <div className={`fixed left-0 top-0 h-screen bg-gray-100 text-gray-800 border-r border-gray-200 transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64'}`}>
       {/* Sidebar Header */}
       <div className="h-16 flex items-center border-b border-gray-200 bg-gray-50 px-4">
+        {/* Fixed missing quotes */}
         <div className={`flex items-center overflow-hidden ${isCollapsed ? 'justify-center w-full' : ''}`}>
           {/* Logo */}
           <svg 
@@ -101,6 +103,7 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
             />
           </svg>
           {/* Title (hidden when collapsed) */}
+          {/* Fixed missing quotes */}
           <h1 className={`text-xl font-semibold text-gray-800 whitespace-nowrap overflow-hidden ${isCollapsed ? 'w-0 opacity-0 ml-0 transition-all duration-200' : 'w-auto opacity-100 ml-2 transition-all duration-300 delay-150'}`}>FillerName</h1>
         </div>
         
@@ -110,11 +113,13 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
       {/* Navigation */}
       <nav className="mt-6">
         {/* MENU Title and Collapse Button */}
+        {/* Fixed missing quotes */}
         <div className={`flex items-center justify-between px-4 mb-3 ${isCollapsed ? 'hidden' : 'block'}`}>
           <h2 className="text-gray-500 uppercase text-xs font-medium tracking-wider">MENU</h2>
           {/* Toggle Button (Moved here) */}
           <button
             onClick={onToggle}
+            // Fixed missing quotes
             className={`p-1 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-200`}
             aria-label="Collapse sidebar"
           >
@@ -134,20 +139,27 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
           </button>
         )}
         
+        {/* --- MODIFICATION --- */}
+        {/* All links are now <Link> components */}
         <Link href="/" className={getLinkClass('/')} title="Dashboard">
           <IconDashboard className="h-5 w-5 flex-shrink-0" />
+          {/* Fixed missing quotes */}
           <span className={`whitespace-nowrap overflow-hidden ${isCollapsed ? 'w-0 opacity-0 ml-0 transition-all duration-200' : 'w-auto opacity-100 ml-3 transition-all duration-300 delay-150'}`}>Dashboard</span>
         </Link>
         
-        <a href="/live" className={getLinkClass('/live')} title="Live Recording">
+        <Link href="/live" className={getLinkClass('/live')} title="Live Recording">
           <IconLive className="h-5 w-5 flex-shrink-0" />
+          {/* Fixed missing quotes */}
+          {/* This is the line that was fixed. The junk text has been removed. */}
           <span className={`whitespace-nowrap overflow-hidden ${isCollapsed ? 'w-0 opacity-0 ml-0 transition-all duration-200' : 'w-auto opacity-100 ml-3 transition-all duration-300 delay-150'}`}>Live Recording</span>
-        </a>
+        </Link>
         
-        <a href="/captures" className={getLinkClass('/captures')} title="Saved Captures">
+        <Link href="/captures" className={getLinkClass('/captures')} title="Saved Captures">
           <IconCaptures className="h-5 w-5 flex-shrink-0" />
+          {/* Fixed missing quotes */}
           <span className={`whitespace-nowrap overflow-hidden ${isCollapsed ? 'w-0 opacity-0 ml-0 transition-all duration-200' : 'w-auto opacity-100 ml-3 transition-all duration-300 delay-150'}`}>Saved Captures</span>
-        </a>
+        </Link>
+        {/* --- END MODIFICATION --- */}
       </nav>
     </div>
   );
