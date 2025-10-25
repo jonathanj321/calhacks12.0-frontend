@@ -1,2 +1,3 @@
-cd into frontEnd
+cd into frontEnd, 
+npm install, 
 npm run dev
